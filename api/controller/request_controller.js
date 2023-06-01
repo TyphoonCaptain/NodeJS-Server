@@ -145,9 +145,9 @@ exports.delete_request = (req, res, next) => {
         res.status(200).json({
             message: 'Request deleted',
             request: {
-                type: 'POST',
+                type: 'GET',
                 url: 'http://localhost:3000/requests',
-                body: {userId: 'ID', requestType: 'String', requestQuantity: 'Number', requestDate: 'Date', requestTime: 'String'}
+                body: {userId: 'ID', requestType: 'String', requestQuantity: 'Number', requestDate: 'String', requestTime: 'String'}
             }
         });
     })

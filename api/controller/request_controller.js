@@ -5,8 +5,8 @@ const User = require('../models/User_Schema');
 // Get all requests
 exports.get_all_request = (req, res, next) => {
     Request.find()
-    .select('_id userId requestType requestQuantity requestDate requestTime')
-    .populate('userId')
+    .select('_id userId requestType requestQuantity requestDetails location requestDate requestTime')
+    //.populate('userId')
     .exec()
     .then(docs => {
         
@@ -19,6 +19,8 @@ exports.get_all_request = (req, res, next) => {
                         userId: doc.userId,
                         requestType: doc.requestType,
                         requestQuantity: doc.requestQuantity,
+                        requestDetails: doc.requestDetails,
+                        location: doc.location,
                         requestDate: doc.requestDate,
                         requestTime: doc.requestTime,
                         request: {
@@ -50,6 +52,7 @@ exports.request_create = (req, res, next) => {
                     userId: req.body.userId,
                     requestType: req.body.requestType,
                     requestQuantity: req.body.requestQuantity,
+                    requestDetails: req.body.requestDetails,
                     location: {
                         X: req.body.location.X,
                         Y: req.body.location.Y
@@ -67,6 +70,7 @@ exports.request_create = (req, res, next) => {
                                 userId: createdRequest.userId,
                                 requestType: createdRequest.requestType,
                                 requestQuantity: createdRequest.requestQuantity,
+                                requestDetails: createdRequest.requestDetails,
                                 location: {
                                     X: createdRequest.location.X,
                                     Y: createdRequest.location.Y
@@ -102,7 +106,28 @@ exports.get_request = (req, res, next) => {
     Request.findById(id).exec().then(doc => {
         if(doc){
             res.status(200).json({
-                request: doc,
+                result: doc,
+                request: {
+                    type: 'GET',
+                    url: 'http://localhost:3000/requests'
+                }
+            });
+        }else{
+            res.status(404).json({message: 'No valid entry found for provided ID'});
+        }
+    }).catch(err => {
+        console.log(err);
+        res.status(500).json({error: err});
+    });
+}
+
+exports.get_request_by_user = (req, res, next) => {
+    const id = req.params.userId;
+    Request.find({userId: id}).exec().then(doc => {
+        if(doc){
+            res.status(200).json({
+                count: doc.length,
+                result: doc,
                 request: {
                     type: 'GET',
                     url: 'http://localhost:3000/requests'
@@ -120,13 +145,10 @@ exports.get_request = (req, res, next) => {
 // Update request by id
 exports.update_request = (req, res, next) => {
     const id = req.params.requestId;
-    const updateOps = {};
-    for(const ops of req.body){
-        updateOps[ops.propName] = ops.value;
-    }
-    Request.update({_id: id}, {$set: updateOps}).exec().then(result => {
+    Request.findOneAndUpdate({_id: id}, req.body, {new: true}).exec().then(result => {
         res.status(200).json({
             message: 'Request updated',
+            result,
             request: {
                 type: 'GET',
                 url: 'http://localhost:3000/requests/' + id
@@ -143,12 +165,8 @@ exports.delete_request = (req, res, next) => {
     const id = req.params.requestId;
     Request.findByIdAndDelete(id).exec().then(result => {
         res.status(200).json({
-            message: 'Request deleted',
-            request: {
-                type: 'GET',
-                url: 'http://localhost:3000/requests',
-                body: {userId: 'ID', requestType: 'String', requestQuantity: 'Number', requestDate: 'String', requestTime: 'String'}
-            }
+            result,
+            message: 'Request deleted'
         });
     })
     .catch(err => {

@@ -6,6 +6,7 @@ const requestSchema = mongoose.Schema({
     userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
     requestType: {type: String, required: true},
     requestQuantity: {type: Number, default: 1},
+    requestDetails: {type: String, default: 'No details provided'},
     location: {
         X: {type: Number, required: true},
         Y: {type: Number, required: true}

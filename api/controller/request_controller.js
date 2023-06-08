@@ -20,6 +20,7 @@ exports.get_all_request = (req, res, next) => {
                         requestType: doc.requestType,
                         requestQuantity: doc.requestQuantity,
                         requestDetails: doc.requestDetails,
+                        requestPriority: doc.requestPriority,
                         location: doc.location,
                         requestDate: doc.requestDate,
                         requestTime: doc.requestTime,
@@ -53,6 +54,7 @@ exports.request_create = (req, res, next) => {
                     requestType: req.body.requestType,
                     requestQuantity: req.body.requestQuantity,
                     requestDetails: req.body.requestDetails,
+                    requestPriority: req.body.requestPriority,
                     location: {
                         X: req.body.location.X,
                         Y: req.body.location.Y
@@ -71,6 +73,7 @@ exports.request_create = (req, res, next) => {
                                 requestType: createdRequest.requestType,
                                 requestQuantity: createdRequest.requestQuantity,
                                 requestDetails: createdRequest.requestDetails,
+                                requestPriority: createdRequest.requestPriority,
                                 location: {
                                     X: createdRequest.location.X,
                                     Y: createdRequest.location.Y

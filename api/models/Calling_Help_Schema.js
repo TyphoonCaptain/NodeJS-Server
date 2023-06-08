@@ -7,6 +7,7 @@ const requestSchema = mongoose.Schema({
     requestType: {type: String, required: true},
     requestQuantity: {type: Number, default: 1},
     requestDetails: {type: String, default: 'No details provided'},
+    requestPriority: {type: String, default: 'Az Öncelik'},
     location: {
         X: {type: Number, required: true},
         Y: {type: Number, required: true}

@@ -5,7 +5,7 @@ const User = require('../models/User_Schema');
 
 exports.get_all_user = (req, res, next) => {
     User.find()
-    .select('_id name surname phone email password')
+    .select('_id name phone email password')
     .exec()
     .then(docs => {
         
@@ -16,7 +16,6 @@ exports.get_all_user = (req, res, next) => {
                     return {
                         _id: doc._id,
                         name: doc.name,
-                        surname: doc.surname,
                         phone: doc.phone,
                         email: doc.email,
                         password: doc.password,
@@ -46,8 +45,8 @@ exports.user_signup = (req, res, next) => {
         else
         {
             // Check if phone exists
-            User.find({phone: req.body.phone}).exec().then(passcount => {
-                if(passcount.length >= 1){
+            User.find({phone: req.body.phone}).exec().then(phonecount => {
+                if(phonecount.length >= 1){
                     return res.status(409).json({message: 'Phone exists'});
                 }
                 // Check if password is at least 8 characters
@@ -65,7 +64,6 @@ exports.user_signup = (req, res, next) => {
                             const newUser = new User({
                                 _id: new mongoose.Types.ObjectId(),
                                 name: req.body.name,
-                                surname: req.body.surname,
                                 phone: req.body.phone,
                                 email: req.body.email,
                                 password: hash
@@ -92,7 +90,7 @@ exports.user_signup = (req, res, next) => {
 }
 
 exports.user_login = (req, res, next) => {
-
+    console.log(req.body)
     // Check if phone exists
     User.find({phone: req.body.phone}).exec().then(user => {
         if(user.length < 1){

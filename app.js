@@ -36,7 +36,6 @@ mongoose.Promise = global.Promise;
 app.use('/users', usersRoutes);
 app.use('/requests', requests_Routes);
 
-
 // Error handling
 app.use((req, res, next) => {
     const error = new Error('Not found');

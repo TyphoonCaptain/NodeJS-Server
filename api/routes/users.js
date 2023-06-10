@@ -13,6 +13,8 @@ router.get('/:userId', UserController.get_user);
 
 router.patch('/:userId', UserController.update_user);
 
+router.put('/forgot_password', UserController.forgot_password);
+
 router.patch('/change_password/:userId', UserController.change_password);
 
 router.delete('/:userId', UserController.delete_user);

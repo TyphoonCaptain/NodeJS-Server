@@ -18,11 +18,7 @@ exports.get_all_user = (req, res, next) => {
                         name: doc.name,
                         phone: doc.phone,
                         email: doc.email,
-                        password: doc.password,
-                        request: {
-                            type: 'GET',
-                            url: 'http://localhost:3000/users/' + doc._id
-                        }
+                        password: doc.password
                     }
                 })
             });
@@ -122,6 +118,7 @@ exports.user_login = (req, res, next) => {
     });
 }
 
+
 exports.get_user = (req, res, next) => {
     const id = req.params.userId;
     User.findById(id).exec().then(doc => {
@@ -149,6 +146,35 @@ exports.update_user = (req, res, next) => {
         res.status(500).json({error: err});
     });
 }
+
+exports.forgot_password = (req, res, next) => {
+    const email = req.body.email;
+    User.findOne({ email: email })
+        .then(user => {
+            if (!user) {
+                return res.status(401).json({ message: 'Auth failed' });
+            }
+
+            bcrypt.hash(req.body.newPassword, 10, (err, hash) => {
+                if (err) {
+                    return res.status(500).json({ error: err });
+                } else {
+                    user.password = hash;
+                    user.save()
+                        .then(result => {
+                            res.status(200).json({ result, message: 'Password changed successfully' });
+                        })
+                        .catch(err => {
+                            res.status(500).json({ error: err });
+                        });
+                }
+            });
+        })
+        .catch(err => {
+            res.status(500).json({ error: err });
+        });
+}
+
 
 exports.change_password = (req, res, next) => {
     const id = req.params.userId;
@@ -195,7 +221,7 @@ exports.change_password = (req, res, next) => {
             console.log(err);
             return res.status(500).json({ error: err });
         });
-};
+}
 
 
 exports.delete_user = (req, res, next) => {

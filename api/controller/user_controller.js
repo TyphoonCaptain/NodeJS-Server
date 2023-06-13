@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const User = require('../models/User_Schema');
 
 exports.get_all_user = (req, res, next) => {
@@ -56,7 +55,6 @@ exports.user_signup = (req, res, next) => {
                         if(err){
                             return res.status(500).json({error: err});
                         }else{
-                            console.log(req.body.email);
                             const newUser = new User({
                                 _id: new mongoose.Types.ObjectId(),
                                 name: req.body.name,
@@ -68,7 +66,7 @@ exports.user_signup = (req, res, next) => {
                             newUser.save().then(result => {
                                 console.log(result);
                                 res.status(201).json({ // 201: Created
-                                    message: 'Handling POST requests to /users',
+                                    message: 'User Has Created',
                                     createdUser: result
                                 });
                             })
@@ -86,31 +84,18 @@ exports.user_signup = (req, res, next) => {
 }
 
 exports.user_login = (req, res, next) => {
-    console.log(req.body)
+
     // Check if phone exists
     User.find({phone: req.body.phone}).exec().then(user => {
         if(user.length < 1){
-            return res.status(401).json({message: 'Auth failed'});
+            return res.status(401).json({message: 'Auth failed - (Phone not found)'});
         }
         // Check if password is correct
         bcrypt.compare(req.body.password, user[0].password, (err, result) => {
-            if(err){
-                return res.status(401).json({message: 'Auth failed'});
-            }
             if(result){
-                const token = jwt.sign({
-                    phone: user[0].phone,
-                    userId: user[0]._id
-                },
-                process.env.JWT_KEY,
-                {
-                    expiresIn: "1h"
-                }
-                )
-
-                return res.status(200).json({message: 'Auth successful', token: token});
+                return res.status(200).json({message: 'Auth successful'});
             }
-            res.status(401).json({message: 'Auth failed'});
+            res.status(401).json({message: 'Auth failed - (Password not correct)'});
         });
     }).catch(err => {
         console.log(err);
@@ -122,7 +107,6 @@ exports.user_login = (req, res, next) => {
 exports.get_user = (req, res, next) => {
     const id = req.params.userId;
     User.findById(id).exec().then(doc => {
-        console.log(doc);
         if(doc){
             res.status(200).json(doc);
         }else{
@@ -171,6 +155,7 @@ exports.forgot_password = (req, res, next) => {
             });
         })
         .catch(err => {
+            console.log(err);
             res.status(500).json({ error: err });
         });
 }
